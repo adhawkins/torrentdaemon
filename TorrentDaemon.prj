@@ -1,0 +1,27 @@
+[Project ID]
+Signature=UE Proj: v.1
+[Project Information]
+Use Relative Directory=1
+Relative to Project File=1
+Include Sub Directories=1
+Project Tagfile=
+Project Wordfile=
+Filter=
+Create Tagfile=0
+[Files]
+0=TorrentManager.h
+1=TorrentManager.cc
+2=TorrentDaemon.h
+3=TorrentDaemon.cc
+4=Torrent.h
+5=Torrent.cc
+6=Parser.h
+7=Parser.cc
+8=Makefile
+9=Main.cc
+10=ListenSocket.h
+11=ListenSocket.cc
+12=ConnectionSocket.h
+13=ConnectionSocket.cc
+14=soapTorrent.h
+15=TestClient.cc
