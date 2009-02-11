@@ -6,7 +6,7 @@
 
 class CTorrentFile
 {
-	std::string m_FileName;
+	std::string m_Name;
 	bool m_Excluded;
 }
 
@@ -37,3 +37,7 @@ class CStatus
 };
 
 int torrentdaemon__Status(CStatus& Status);
+int torrentdaemon__Pause(int TorrentID, std::string& Response);
+int torrentdaemon__Resume(int TorrentID, std::string& Response);
+int torrentdaemon__PauseAll(std::string& Response);
+int torrentdaemon__ResumeAll(std::string& Response);

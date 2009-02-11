@@ -21,8 +21,8 @@ public:
 			:	m_Manager(Manager)
 			{
 			}
-	
-			template <class T>			
+
+			template <class T>
 			void operator()(T const& Alert) const
 			{
 				if (m_Manager)
@@ -31,12 +31,16 @@ public:
 
 			CTorrentManager *m_Manager;
 	};
-	
+
 	CTorrentManager(int UploadRate, int DownloadRate, const std::string& DownloadPath);
 	~CTorrentManager();
-	
+
 	CStatus Status() const;
-		
+	std::string PauseTorrent(int TorrentNumber);
+	std::string ResumeTorrent(int TorrentNumber);
+	std::string PauseAll();
+	std::string ResumeAll();
+
 	void AddTorrentURL(CConnectionSocket& Socket, const std::string& TorrentURL);
 	void AddTorrentFile(CConnectionSocket& Socket, const std::string& TorrentURL);
 	void RemoveTorrent(CConnectionSocket& Socket, int Torrent);
@@ -51,7 +55,7 @@ public:
 	void UpdateStartTimes();
 	void CheckComplete();
 	void CheckAlerts();
-	
+
 	void HandleAlert(libtorrent::tracker_alert const& Alert) const;
 	void HandleAlert(libtorrent::tracker_warning_alert const& Alert) const;
 	void HandleAlert(libtorrent::scrape_reply_alert const& Alert) const;
@@ -82,7 +86,7 @@ public:
 	void HandleAlert(libtorrent::peer_blocked_alert const& Alert) const;
 
 protected:
-	libtorrent::session m_Session;	
+	libtorrent::session m_Session;
 	tTorrentMap m_Torrents;
 	int m_MaxTorrent;
 	std::string m_DownloadPath;

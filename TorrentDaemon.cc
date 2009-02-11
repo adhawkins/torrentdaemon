@@ -30,7 +30,7 @@ CTorrentDaemon::CTorrentDaemon(bool DoDaemon, int Port, int SoapPort, int Upload
 
 	signal(SIGHUP,SignalHandler);
 	signal(SIGTERM,SignalHandler);
-	
+
 	MainLoop();
 }
 
@@ -48,7 +48,7 @@ void CTorrentDaemon::SignalHandler(int sig)
 	{
 		case SIGHUP:
 			break;
-			
+
 		case SIGTERM:
 			gv_DoExit=true;
 	}
@@ -80,27 +80,27 @@ bool CTorrentDaemon::BecomeDaemon()
 	for (i=getdtablesize();i>=0;--i)
 		close(i);
 */
-	
+
 	//Ignore SIG_CHLD
 
 	signal(SIGCHLD,SIG_IGN);
-	
+
 	return true;
 }
 
 void CTorrentDaemon::MainLoop()
 {
 	m_Torrents=new CTorrentManager(m_UploadRate,m_DownloadRate,m_DownloadPath);
-	
-	struct soap soap; 
-	soap_init(&soap); 
 
-	#define uSec *-1 
-	#define mSec *-1000 
-	soap.accept_timeout = 100 mSec; 
+	struct soap soap;
+	soap_init(&soap);
+
+	#define uSec *-1
+	#define mSec *-1000
+	soap.accept_timeout = 100 mSec;
 	soap.user = (void *)m_Torrents;
 	soap.bind_flags=SO_REUSEADDR;
- 	
+
 	if (m_ListenSocket.DoListen() && soap_bind(&soap, 0, m_SoapPort, 100)>=0)
 	{
 		while (!gv_DoExit)
@@ -111,22 +111,22 @@ void CTorrentDaemon::MainLoop()
 			m_Torrents->CheckComplete();
 			m_Torrents->CheckAlerts();
 
-			int s = soap_accept(&soap); 
+			int s = soap_accept(&soap);
 			if (s < 0)
-			{ 
+			{
 				if (soap.errnum)  //if timeout, errnum will be zero
-					soap_print_fault(&soap, stderr); 
-			} 
+					soap_print_fault(&soap, stderr);
+			}
 			else
 			{
-				if (soap_serve(&soap) != SOAP_OK)	// process RPC request 
-					soap_print_fault(&soap, stderr); // print error 
-					
-				soap_destroy(&soap);	// clean up class instances 
-				soap_end(&soap);	// clean up everything and close socket 
+				if (soap_serve(&soap) != SOAP_OK)	// process RPC request
+					soap_print_fault(&soap, stderr); // print error
+
+				soap_destroy(&soap);	// clean up class instances
+				soap_end(&soap);	// clean up everything and close socket
 			}
 		}
-		
+
 		soap_done(&soap);
 	}
 
@@ -137,9 +137,9 @@ void CTorrentDaemon::MainLoop()
 		Socket.Close();
 		++ThisSocket;
 	}
-	
+
 	m_ListenSocket.Close();
-	
+
 	delete m_Torrents;
 	m_Torrents=0;
 }
@@ -188,7 +188,7 @@ void CTorrentDaemon::HandleSockets()
 		if (FD_ISSET(m_ListenSocket,&Read))
 		{
 			int NewSocket=m_ListenSocket.Accept();
-			
+
 			if (-1!=NewSocket)
 				m_Connections[NewSocket]=CConnectionSocket(NewSocket);
 		}
@@ -223,7 +223,7 @@ void CTorrentDaemon::HandleSockets()
 		while (ClosedSockets.end()!=ClosedSocket)
 		{
 			CConnectionSocket Socket=m_Connections[*ClosedSocket];
-			
+
 			Socket.Close();
 			m_Connections.erase(*ClosedSocket);
 
@@ -235,13 +235,13 @@ void CTorrentDaemon::HandleSockets()
 void CTorrentDaemon::ProcessCommands()
 {
 	std::vector<int> ClosedSockets;
-		
+
 	tConnectionSocketMapConstIterator ThisSocket=m_Connections.begin();
 	while (ThisSocket!=m_Connections.end())
 	{
 		int SocketHandle=(*ThisSocket).first;
 		CConnectionSocket Socket=(*ThisSocket).second;
-		
+
 		std::string Command=Socket.GetCommand();
 		if (!Command.empty())
 		{
@@ -251,7 +251,7 @@ void CTorrentDaemon::ProcessCommands()
 		}
 
 		m_Connections[SocketHandle]=Socket;
-					
+
 		++ThisSocket;
 	}
 
@@ -271,7 +271,7 @@ bool CTorrentDaemon::ProcessCommand(CConnectionSocket& Socket, const std::string
 	if (!Command.empty())
 	{
 		CParser Parser(Command);
-			
+
 		if (Parser.Command()=="quit")
 		{
 			Socket.Close();
@@ -301,7 +301,7 @@ bool CTorrentDaemon::ProcessCommand(CConnectionSocket& Socket, const std::string
 			os << "limits       - display current upload and download limits" << std::endl;
 
 			os << std::endl;
-				
+
 			Socket.AppendSendBuffer(os.str());
 		}
 		else if (Parser.Command()=="addurl")
@@ -396,16 +396,56 @@ bool CTorrentDaemon::ProcessCommand(CConnectionSocket& Socket, const std::string
 		else
 			Socket.AppendSendBuffer("Invalid command " + Parser.Command() + "\n");
 	}
-			
+
 	return Closed;
 }
 
 int torrentdaemon__Status(struct soap *Soap, CStatus& Status)
 {
 	CTorrentManager *Manager=(CTorrentManager *)Soap->user;
-	
+
 	if (Manager)
 		Status=Manager->Status();
-		
+
+	return SOAP_OK;
+}
+
+int torrentdaemon__Pause(struct soap *Soap, int TorrentNumber, std::string& Response)
+{
+	CTorrentManager *Manager=(CTorrentManager *)Soap->user;
+
+	if (Manager)
+		Response=Manager->PauseTorrent(TorrentNumber);
+
+	return SOAP_OK;
+}
+
+int torrentdaemon__Resume(struct soap *Soap, int TorrentNumber, std::string& Response)
+{
+	CTorrentManager *Manager=(CTorrentManager *)Soap->user;
+
+	if (Manager)
+		Response=Manager->ResumeTorrent(TorrentNumber);
+
+	return SOAP_OK;
+}
+
+int torrentdaemon__PauseAll(struct soap *Soap, std::string& Response)
+{
+	CTorrentManager *Manager=(CTorrentManager *)Soap->user;
+
+	if (Manager)
+		Response=Manager->PauseAll();
+
+	return SOAP_OK;
+}
+
+int torrentdaemon__ResumeAll(struct soap *Soap, std::string& Response)
+{
+	CTorrentManager *Manager=(CTorrentManager *)Soap->user;
+
+	if (Manager)
+		Response=Manager->ResumeAll();
+
 	return SOAP_OK;
 }
