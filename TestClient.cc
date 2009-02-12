@@ -42,27 +42,27 @@ int main(int argc, char * const argv[])
 
 	std::string Response;
 
-	if (SOAP_OK==Daemon.torrentdaemon__Delete(23,Response))
-	{
-		std::cout << "Delete 23 returns '" << Response << "'" << std::endl;
-	}
-	else
-	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
-		soap_print_fault(Daemon.soap, stderr);
-	}
-	
-	if (SOAP_OK==Daemon.torrentdaemon__Delete(23,Response))
-	{
-		std::cout << "Delete 23 returns '" << Response << "'" << std::endl;
-	}
-	else
-	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
-		soap_print_fault(Daemon.soap, stderr);
-	}
-	
 /*
+	if (SOAP_OK==Daemon.torrentdaemon__Delete(23,Response))
+	{
+		std::cout << "Delete 23 returns '" << Response << "'" << std::endl;
+	}
+	else
+	{
+		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		soap_print_fault(Daemon.soap, stderr);
+	}
+	
+	if (SOAP_OK==Daemon.torrentdaemon__Delete(23,Response))
+	{
+		std::cout << "Delete 23 returns '" << Response << "'" << std::endl;
+	}
+	else
+	{
+		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		soap_print_fault(Daemon.soap, stderr);
+	}
+	
 	if (SOAP_OK==Daemon.torrentdaemon__ResumeAll(Response))
 	{
 		std::cout << "Resume all returns '" << Response << "'" << std::endl;
@@ -73,7 +73,16 @@ int main(int argc, char * const argv[])
 		soap_print_fault(Daemon.soap, stderr);
 	}
 
-	sleep(5);
+	if (SOAP_OK==Daemon.torrentdaemon__PauseAll(Response))
+	{
+		std::cout << "Pause 22 returns '" << Response << "'" << std::endl;
+	}
+	else
+	{
+		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		soap_print_fault(Daemon.soap, stderr);
+	}
+*/
 
 	CStatus Status;
 
@@ -135,18 +144,6 @@ int main(int argc, char * const argv[])
 		soap_print_fault(Daemon.soap, stderr);
 	}
 
-	sleep(5);
-
-	if (SOAP_OK==Daemon.torrentdaemon__PauseAll(Response))
-	{
-		std::cout << "Pause 22 returns '" << Response << "'" << std::endl;
-	}
-	else
-	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
-		soap_print_fault(Daemon.soap, stderr);
-	}
-*/
 }
 
 std::string FormatRate(float Rate)
