@@ -2,7 +2,7 @@ DAEMONOBJS=TorrentDaemon.o Main.o ListenSocket.o ConnectionSocket.o \
 		TorrentManager.o Torrent.o Parser.o soapC.o soapServer.o
 CLIENTOBJS=TestClient.o soapC.o soapClient.o
 
-CXXFLAGS=-pthread -I/usr/include/libtorrent -Wall -Werror -Wno-deprecated-declarations
+CXXFLAGS=-pthread -I/usr/include/libtorrent -Wall -Werror
 #CXXFLAGS+=-g -ggdb
 DAEMONLDFLAGS=-pthread -lboost_date_time -lboost_filesystem -lboost_thread -ltorrent -lhttp_fetcher -llog4cpp -lgsoap
 CLIENTLDFLAGS=-lgsoap

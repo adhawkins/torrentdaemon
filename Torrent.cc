@@ -293,10 +293,20 @@ void CTorrent::SetExcludeFiles(std::vector<bool> ExcludeFiles)
 {
 	if (ExcludeFiles.size()==m_ExcludeFiles.size())
 	{
+		std::vector<int> Priorities;
+		Priorities.resize(m_ExcludeFiles.size());
+		for (std::vector<int>::size_type count=0;count<m_ExcludeFiles.size();count++)
+		{
+			if (ExcludeFiles[count])
+				Priorities[count]=0;
+			else
+				Priorities[count]=1;
+		}
+		
 		try
 		{
 			m_ExcludeFiles=ExcludeFiles;
-			m_Torrent.filter_files(m_ExcludeFiles);
+			m_Torrent.prioritize_files(Priorities);
 		}
 		
 		catch (std::exception& e)
