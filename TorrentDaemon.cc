@@ -449,3 +449,13 @@ int torrentdaemon__ResumeAll(struct soap *Soap, std::string& Response)
 
 	return SOAP_OK;
 }
+
+int torrentdaemon__Delete(struct soap *Soap, int TorrentID, std::string& Response)
+{
+	CTorrentManager *Manager=(CTorrentManager *)Soap->user;
+
+	if (Manager)
+		Response=Manager->RemoveTorrent(TorrentID);
+
+	return SOAP_OK;
+}

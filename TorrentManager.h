@@ -40,6 +40,7 @@ public:
 	std::string ResumeTorrent(int TorrentNumber);
 	std::string PauseAll();
 	std::string ResumeAll();
+	std::string RemoveTorrent(int TorrentID);
 
 	void AddTorrentURL(CConnectionSocket& Socket, const std::string& TorrentURL);
 	void AddTorrentFile(CConnectionSocket& Socket, const std::string& TorrentURL);

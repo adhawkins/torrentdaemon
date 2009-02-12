@@ -41,3 +41,4 @@ int torrentdaemon__Pause(int TorrentID, std::string& Response);
 int torrentdaemon__Resume(int TorrentID, std::string& Response);
 int torrentdaemon__PauseAll(std::string& Response);
 int torrentdaemon__ResumeAll(std::string& Response);
+int torrentdaemon__Delete(int TorrentID, std::string& Response);

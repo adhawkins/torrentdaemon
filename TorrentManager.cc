@@ -974,3 +974,33 @@ std::string CTorrentManager::ResumeAll()
 
 	return Response.str();
 }
+
+std::string CTorrentManager::RemoveTorrent(int TorrentID)
+{
+	std::string Status="Torrent deleted";
+		
+	try
+	{
+		tTorrentMapConstIterator ThisTorrent=m_Torrents.find(TorrentID);
+		if (ThisTorrent!=m_Torrents.end())
+		{
+			CTorrent RemoveTorrent=(*ThisTorrent).second;
+			m_Session.remove_torrent(RemoveTorrent);
+			m_Torrents.erase(TorrentID);
+
+			std::stringstream TorrentFile;
+			TorrentFile << m_DownloadPath << "/" << TorrentID << ".torrent";
+			unlink(TorrentFile.str().c_str());
+		}
+		else
+			Status="Invalid torrent ID";
+	}
+
+	catch (std::exception& e)
+	{
+  		std::cout << e.what() << "\n";
+  		Status=e.what();
+	}
+	
+	return Status;
+}
