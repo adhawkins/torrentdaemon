@@ -8,10 +8,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-extern "C"
-{
-#include <http_fetcher.h>
-}
+#include "HTTPFetch.h"
 
 #include "libtorrent/bencode.hpp"
 
@@ -109,8 +106,9 @@ void CTorrentManager::AddTorrentURL(CConnectionSocket& Socket, const std::string
 {
 	try
 	{
+		CHTTPFetch Fetcher;
 		char *Buffer=0;
-		int Bytes=http_fetch(TorrentURL.c_str(),&Buffer);
+		int Bytes=Fetcher.Fetch(TorrentURL.c_str());
 		if (Bytes>0)
 		{
 			int Number=GetNextTorrentNumber();
@@ -120,7 +118,8 @@ void CTorrentManager::AddTorrentURL(CConnectionSocket& Socket, const std::string
 			FILE *fptr=fopen(TorrentFile.str().c_str(),"wb");
 			if (fptr)
 			{
-				fwrite(Buffer, 1, Bytes, fptr);
+				std::vector<unsigned char> Data=Fetcher.Data();
+				fwrite(&Data[0], 1, Bytes, fptr);
 				fclose(fptr);
 			}
 
@@ -128,7 +127,7 @@ void CTorrentManager::AddTorrentURL(CConnectionSocket& Socket, const std::string
 			AddTorrent(Entry,Number,libtorrent::entry(),&Socket);
 		}
 		else
-			Socket.AppendSendBuffer(std::string("HTTP download error: ") + http_strerror() + "\n");
+			Socket.AppendSendBuffer(std::string("HTTP download error: ") + Fetcher.ErrorMessage() + "\n");
 
 		if (Buffer)
 			free(Buffer);

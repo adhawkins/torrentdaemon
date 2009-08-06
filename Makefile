@@ -1,11 +1,13 @@
 DAEMONOBJS=TorrentDaemon.o Main.o ListenSocket.o ConnectionSocket.o \
-		TorrentManager.o Torrent.o Parser.o soapC.o soapServer.o
+		TorrentManager.o Torrent.o Parser.o soapC.o soapServer.o \
+		HTTPFetch.o
+		
 CLIENTOBJS=TestClient.o soapC.o soapClient.o
 
-CXXFLAGS=-pthread -I/usr/include/libtorrent -Wall -Werror
+CXXFLAGS=-pthread -I/usr/include/libtorrent -Wall -Werror `neon-config --cflags`
 #CXXFLAGS+=-g -ggdb
-DAEMONLDFLAGS=-pthread -lboost_date_time -lboost_filesystem -lboost_thread -ltorrent -lhttp_fetcher -llog4cpp -lgsoap
-CLIENTLDFLAGS=-lgsoap
+DAEMONLDFLAGS=-pthread -lboost_date_time -lboost_filesystem -lboost_thread -ltorrent-rasterbar `neon-config --libs` -llog4cpp -lgsoap++
+CLIENTLDFLAGS=-lgsoap++
 
 SOAPTARGETS=soapC.cpp soapClient.cpp soapClientLib.cpp soapH.h \
 							soapServer.cpp soapServerLib.cpp soapStub.h \
