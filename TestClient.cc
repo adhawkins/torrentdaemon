@@ -49,27 +49,27 @@ int main(int argc, char * const argv[])
 	}
 	else
 	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		std::cout << "Endpoint is '" << Daemon.endpoint << "'" << std::endl;
 		soap_print_fault(Daemon.soap, stderr);
 	}
-	
+
 	if (SOAP_OK==Daemon.torrentdaemon__Delete(23,Response))
 	{
 		std::cout << "Delete 23 returns '" << Response << "'" << std::endl;
 	}
 	else
 	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		std::cout << "Endpoint is '" << Daemon.endpoint << "'" << std::endl;
 		soap_print_fault(Daemon.soap, stderr);
 	}
-	
+
 	if (SOAP_OK==Daemon.torrentdaemon__ResumeAll(Response))
 	{
 		std::cout << "Resume all returns '" << Response << "'" << std::endl;
 	}
 	else
 	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		std::cout << "Endpoint is '" << Daemon.endpoint << "'" << std::endl;
 		soap_print_fault(Daemon.soap, stderr);
 	}
 
@@ -79,7 +79,7 @@ int main(int argc, char * const argv[])
 	}
 	else
 	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		std::cout << "Endpoint is '" << Daemon.endpoint << "'" << std::endl;
 		soap_print_fault(Daemon.soap, stderr);
 	}
 */
@@ -140,7 +140,7 @@ int main(int argc, char * const argv[])
 	}
 	else
 	{
-		printf("Endpoint is '%s'\n",Daemon.endpoint);
+		std::cout << "Endpoint is '" << Daemon.endpoint << "'" << std::endl;
 		soap_print_fault(Daemon.soap, stderr);
 	}
 

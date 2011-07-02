@@ -46,19 +46,19 @@ void CTorrent::SetStartTime(time_t StartTime)
 		{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 		}
-	}						
+	}
 }
 
 std::string CTorrent::GetRemaining() const
 {
 	std::string Ret="Unknown";
-		
+
 	if (!IsPaused())
 	{
 		try
 		{
 			libtorrent::torrent_status Status=m_Torrent.status();
-	
+
 			int BytesRemaining=Status.total_wanted-Status.total_wanted_done;
 			switch (Status.state)
 			{
@@ -66,25 +66,24 @@ std::string CTorrent::GetRemaining() const
 				case libtorrent::torrent_status::seeding:
 					Ret="Complete";
 					break;
-					
+
 				case libtorrent::torrent_status::downloading:
-				case libtorrent::torrent_status::connecting_to_tracker:
 					if (m_StartDone==0)
 						m_StartDone=Status.total_wanted_done;
-						
+
 					if (BytesRemaining>0)
 					{
 						time_t TimeTaken=time(NULL)-m_StartTime;
-						
+
 						if (TimeTaken>0)
 						{
 							int BytesDone=Status.total_wanted_done-m_StartDone;
 							double BytesPerSec=(double)BytesDone/(double)TimeTaken;
-							
+
 							if (BytesPerSec>0.5)
 							{
 								time_t Remaining=(time_t)((double)BytesRemaining/BytesPerSec);
-				
+
 								Ret=FormatTime(Remaining);
 							}
 						}
@@ -95,16 +94,17 @@ std::string CTorrent::GetRemaining() const
 				case libtorrent::torrent_status::checking_files:
 				case libtorrent::torrent_status::downloading_metadata:
 				case libtorrent::torrent_status::allocating:
+				case libtorrent::torrent_status::checking_resume_data:
 					break;
 			}
 		}
-			
+
 		catch (std::exception& e)
 		{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 		}
 	}
-	
+
 	return Ret;
 }
 
@@ -116,7 +116,7 @@ CTorrent::operator libtorrent::torrent_handle() const
 libtorrent::size_type CTorrent::WantedDone() const
 {
 	libtorrent::size_type Ret=0;
-	
+
 	try
 	{
 		libtorrent::torrent_status Status=m_Torrent.status();
@@ -127,14 +127,14 @@ libtorrent::size_type CTorrent::WantedDone() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return Ret;
 }
 
 libtorrent::size_type CTorrent::Wanted() const
 {
 	libtorrent::size_type Ret=0;
-	
+
 	try
 	{
 		libtorrent::torrent_status Status=m_Torrent.status();
@@ -145,14 +145,14 @@ libtorrent::size_type CTorrent::Wanted() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return Ret;
 }
 
 libtorrent::size_type CTorrent::Uploaded() const
 {
 	libtorrent::size_type Ret=0;
-	
+
 	try
 	{
 		libtorrent::torrent_status Status=m_Torrent.status();
@@ -163,14 +163,14 @@ libtorrent::size_type CTorrent::Uploaded() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return Ret;
 }
 
 float CTorrent::UploadRate() const
 {
 	float Ret=0.0;
-	
+
 	try
 	{
 		libtorrent::torrent_status Status=m_Torrent.status();
@@ -181,14 +181,14 @@ float CTorrent::UploadRate() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return Ret;
 }
 
 float CTorrent::DownloadRate() const
 {
 	float Ret=0.0;
-	
+
 	try
 	{
 		libtorrent::torrent_status Status=m_Torrent.status();
@@ -199,14 +199,14 @@ float CTorrent::DownloadRate() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return Ret;
 }
 
 std::string CTorrent::Name() const
 {
 	std::string Ret;
-	
+
 	try
 	{
 		libtorrent::torrent_info Info=m_Torrent.get_torrent_info();
@@ -217,14 +217,14 @@ std::string CTorrent::Name() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return Ret;
 }
 
 int CTorrent::Progress() const
 {
 	int Ret=0;
-	
+
 	try
 	{
 		libtorrent::torrent_status Status=m_Torrent.status();
@@ -235,7 +235,7 @@ int CTorrent::Progress() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return Ret;
 }
 
@@ -251,13 +251,13 @@ libtorrent::torrent_status::state_t CTorrent::State() const
 		{
 			Ret=m_Torrent.status().state;
 		}
-	
+
 		catch (std::exception& e)
 		{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 		}
 	}
-		
+
 	return Ret;
 }
 
@@ -269,23 +269,23 @@ std::vector<bool> CTorrent::ExcludeFiles() const
 std::vector<std::string> CTorrent::Files() const
 {
 	std::vector<std::string> Ret;
-		
+
 	libtorrent::torrent_info Info=m_Torrent.get_torrent_info();
 	libtorrent::torrent_info::file_iterator ThisFile=Info.begin_files();
 	while (ThisFile!=Info.end_files())
 	{
 		libtorrent::file_entry File=(*ThisFile);
-		
+
 		std::string FileName=File.path.string();
 		std::string::size_type SlashPos=FileName.rfind('/');
 		if (SlashPos!=std::string::npos)
 			FileName=FileName.substr(SlashPos+1);
-			
+
 		Ret.push_back(FileName);
-		
+
 		++ThisFile;
 	}
-	
+
 	return Ret;
 }
 
@@ -302,20 +302,20 @@ void CTorrent::SetExcludeFiles(std::vector<bool> ExcludeFiles)
 			else
 				Priorities[count]=1;
 		}
-		
+
 		try
 		{
 			m_ExcludeFiles=ExcludeFiles;
 			m_Torrent.prioritize_files(Priorities);
 		}
-		
+
 		catch (std::exception& e)
 		{
 	  		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 		}
 	}
 	else
-		printf("Invalid size (%d - %d)\n",ExcludeFiles.size(),m_ExcludeFiles.size());
+		std::cout << "Invalid size (" << ExcludeFiles.size() << " - " << m_ExcludeFiles.size() << std::endl;
 }
 
 void CTorrent::SaveStatus(const std::string& File) const
@@ -325,7 +325,7 @@ void CTorrent::SaveStatus(const std::string& File) const
 		libtorrent::entry::dictionary_type ExcludeFiles;
 		libtorrent::entry::dictionary_type StatusFile;
 		libtorrent::entry::dictionary_type State;
-		
+
 		State["complete"]=libtorrent::entry(m_Complete?1:0);
 		State["uploaded"]=libtorrent::entry(Uploaded());
 		StatusFile["state"]=State;
@@ -334,31 +334,31 @@ void CTorrent::SaveStatus(const std::string& File) const
 		{
 			std::stringstream os;
 			os << count;
-			
+
 			ExcludeFiles[os.str()]=m_ExcludeFiles[count];
 		}
-				
+
 		StatusFile["exclude"]=ExcludeFiles;
-		
+
 		try
 		{
 			//Pause the torrent and save the resume status
-		
+
 			m_Torrent.pause();
-		
+
 			libtorrent::entry Resume=m_Torrent.write_resume_data();
 			if (Resume.type()==libtorrent::entry::dictionary_t)
 				StatusFile["resume"]=Resume;
 		}
-	
+
 		catch (std::exception& e)
 		{
 	  		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 		}
-		
+
 		std::ofstream out(File.c_str(), std::ios_base::binary);
 		out.unsetf(std::ios_base::skipws);
-			
+
 		bencode(std::ostream_iterator<char>(out),StatusFile);
 	}
 
@@ -379,7 +379,7 @@ void CTorrent::LoadState(const libtorrent::entry& StatusFile)
 			m_Complete=Complete->integer()?true:false;
 			if (m_Complete)
 				Pause();
-				
+
 			const libtorrent::entry *Uploaded=State->find_key("uploaded");
 			if (Uploaded)
 				m_StartUploaded=Uploaded->integer();
@@ -395,14 +395,14 @@ void CTorrent::LoadState(const libtorrent::entry& StatusFile)
 libtorrent::entry CTorrent::ExtractResume(const libtorrent::entry& StatusFile)
 {
 	libtorrent::entry Resume;
-		
+
 	try
 	{
 		const libtorrent::entry *Search=StatusFile.find_key("resume");
 		if (Search)
 			Resume=*Search;
 	}
-	
+
 	catch (std::exception& e)
 	{
   		std::cout << __PRETTY_FUNCTION__ << " - " << e.what() << "\n";
@@ -413,14 +413,14 @@ libtorrent::entry CTorrent::ExtractResume(const libtorrent::entry& StatusFile)
 libtorrent::entry CTorrent::LoadStatus(const std::string& File)
 {
 	libtorrent::entry Ret;
-		
+
 	try
 	{
 		std::ifstream in(File.c_str(), std::ios_base::binary);
 		in.unsetf(std::ios_base::skipws);
 		Ret = libtorrent::bdecode(std::istream_iterator<char>(in), std::istream_iterator<char>());
 	}
-	
+
 	catch (std::exception& e)
 	{
   		std::cout << __PRETTY_FUNCTION__ << " - " << e.what() << "\n";
@@ -437,16 +437,16 @@ void CTorrent::SetExcludeFiles(const libtorrent::entry& StatusFile)
 		if (Excludes)
 		{
 			std::vector<bool> ExcludeFiles=m_ExcludeFiles;
-			
+
 			for (std::vector<bool>::size_type count=0;count<ExcludeFiles.size();count++)
 			{
 				std::stringstream os;
 				os << count;
-				
+
 				const libtorrent::entry *ExcludeFile=Excludes->find_key(os.str().c_str());
 				if (ExcludeFile)
 					ExcludeFiles[count]=ExcludeFile->integer()?true:false;
-			
+
 				SetExcludeFiles(ExcludeFiles);
 			}
 		}
@@ -487,7 +487,7 @@ void CTorrent::Resume()
 bool CTorrent::IsPaused() const
 {
 	bool RetVal=false;
-	
+
 	try
 	{
 		RetVal=m_Torrent.is_paused();
@@ -497,7 +497,7 @@ bool CTorrent::IsPaused() const
 	{
   		std::cout << __PRETTY_FUNCTION__ << ": " << m_Number << " - " << e.what() << "\n";
 	}
-	
+
 	return RetVal;
 }
 
@@ -507,12 +507,12 @@ std::string CTorrent::FormatTime(time_t Time) const
 	int Left=Time%3600;
 	int Mins=Left/60;
 	int Secs=Left%60;
-	
+
 	std::stringstream os;
-	os << std::setw(2) << std::setfill('0') << Hours << ":" 
-		<< std::setw(2) << std::setfill('0') << Mins << ":" 
+	os << std::setw(2) << std::setfill('0') << Hours << ":"
+		<< std::setw(2) << std::setfill('0') << Mins << ":"
 		<< std::setw(2) << std::setfill('0') << Secs;
-			
+
 	return os.str();
 }
 

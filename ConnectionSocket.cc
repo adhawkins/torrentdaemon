@@ -1,5 +1,6 @@
 #include "ConnectionSocket.h"
 
+#include <stdio.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -19,7 +20,7 @@ void CConnectionSocket::Close()
 		shutdown(m_Socket,SHUT_RDWR);
 		close(m_Socket);
 	}
-	
+
 	m_Socket=-1;
 }
 
@@ -36,7 +37,7 @@ bool CConnectionSocket::SendBufferEmpty() const
 bool CConnectionSocket::Read()
 {
 	bool Closed=false;
-	
+
 	unsigned char *Buffer=new unsigned char[1024];
 
 	int Received=recv(m_Socket,Buffer,1024,0);
@@ -69,39 +70,39 @@ int CConnectionSocket::Send()
 		perror("send");
 	else
 		m_SendBuffer=m_SendBuffer.substr(Sent);
-		
+
 	return Sent;
 }
 
 std::string CConnectionSocket::GetCommand()
 {
 	std::string Command;
-		
+
 	std::string::size_type FirstDelim=m_ReceiveBuffer.find_first_of("\n\r",0);
 	if (FirstDelim!=std::string::npos)
 	{
 		Command=m_ReceiveBuffer.substr(0,FirstDelim);
 		m_ReceiveBuffer=m_ReceiveBuffer.substr(FirstDelim);
-		
+
 		Command=StripDelims(Command,true,true);
 		m_ReceiveBuffer=StripDelims(m_ReceiveBuffer,true,false);
 	}
-	
+
 	return Command;
 }
 
 std::string CConnectionSocket::StripDelims(const std::string &Source, bool Front, bool Back) const
 {
 	std::string StrippedString=Source;
-			
+
 	if (!Source.empty())
 	{
 		while (Front && (StrippedString.substr(0,1)=="\n" || StrippedString.substr(0,1)=="\r"))
 			StrippedString=StrippedString.substr(1);
-			
+
 		while (Back && (StrippedString.substr(StrippedString.length()-1)=="\n" || StrippedString.substr(StrippedString.length()-1)=="\r"))
 			StrippedString=StrippedString.substr(0,StrippedString.length()-1);
-	}		
-	
+	}
+
 	return StrippedString;
 }

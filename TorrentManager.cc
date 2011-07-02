@@ -567,6 +567,7 @@ void CTorrentManager::CheckAlerts()
 		{
 			try
 			{
+/*
 				libtorrent::handle_alert<
 																	libtorrent::tracker_alert,
 																	libtorrent::tracker_warning_alert,
@@ -597,6 +598,7 @@ void CTorrentManager::CheckAlerts()
 																	libtorrent::fastresume_rejected_alert,
 																	libtorrent::peer_blocked_alert
 																>::handle_alert(Alert, AlertHandler);
+*/
 			}
 			catch (std::exception& e)
 			{
@@ -662,10 +664,6 @@ std::string CTorrentManager::FormatState(libtorrent::torrent_status::state_t Sta
 			Ret="Checking files";
 			break;
 
-		case libtorrent::torrent_status::connecting_to_tracker:
-			Ret="Connecting to tracker";
-			break;
-
 		case libtorrent::torrent_status::downloading:
 			Ret="Downloading";
 			break;
@@ -684,6 +682,10 @@ std::string CTorrentManager::FormatState(libtorrent::torrent_status::state_t Sta
 
 		case libtorrent::torrent_status::allocating:
 			Ret="Allocating";
+			break;
+
+		case libtorrent::torrent_status::checking_resume_data:
+			Ret="Checking resume data";
 			break;
 	}
 
@@ -722,6 +724,7 @@ void CTorrentManager::DisplayLimits(CConnectionSocket& Socket)
 	Socket.AppendSendBuffer(Response.str());
 }
 
+/*
 void CTorrentManager::HandleAlert(libtorrent::tracker_alert const& Alert) const
 {
 	log4cpp::Category& Category=log4cpp::Category::getInstance("main_cat");
@@ -889,6 +892,7 @@ void CTorrentManager::HandleAlert(libtorrent::peer_blocked_alert const& Alert) c
 	log4cpp::Category& Category=log4cpp::Category::getInstance("main_cat");
 	Category.info(Alert.msg());
 }
+*/
 
 std::string CTorrentManager::PauseTorrent(int TorrentNumber)
 {
@@ -977,7 +981,7 @@ std::string CTorrentManager::ResumeAll()
 std::string CTorrentManager::RemoveTorrent(int TorrentID)
 {
 	std::string Status="Torrent deleted";
-		
+
 	try
 	{
 		tTorrentMapConstIterator ThisTorrent=m_Torrents.find(TorrentID);
@@ -1000,6 +1004,6 @@ std::string CTorrentManager::RemoveTorrent(int TorrentID)
   		std::cout << e.what() << "\n";
   		Status=e.what();
 	}
-	
+
 	return Status;
 }
